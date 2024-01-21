@@ -1,0 +1,19 @@
+.message_button {
+  padding: 7px 15px;
+  background: rgb(156, 9, 240);
+  color: #fff;
+  border: none;
+  outline: none;
+  border-radius: 5px;
+}
+
+.message_button:hover {
+  background-color: rgb(110, 0, 173);
+}
+
+@media only screen and (max-width: 768px) {
+  .message_button {
+    margin-bottom: 40px;
+    font-size: 0.8rem;
+  }
+}

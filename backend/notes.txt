@@ -1,0 +1,7 @@
+Endpoints
+localhost:3000/users/signin
+localhost:3000/users/signup
+localhost:3000/news/news_id
+localhost:3000/vehicle/vehicle_id
+localhost:3000/vehicle/vehicle_id/reviews
+localhost:3000/vehicle/vehicle_id/reviews/review_id

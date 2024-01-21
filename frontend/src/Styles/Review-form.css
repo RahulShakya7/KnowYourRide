@@ -1,0 +1,32 @@
+
+
+.review {
+  padding: 12px;
+  background-color: rgb(156, 9, 240);
+}
+
+
+.review:hover {
+  background-color: rgb(110, 0, 173);
+}
+
+.textarea {
+  width: 100%;
+  padding: 10px 15px;
+  color: #817c97;
+  border: 1px solid rgb(90, 69, 99);
+  border-radius: 4px;
+}
+
+
+@media only screen and (max-width: 768px) {
+  .booking__form {
+    width: 100%;
+  }
+
+  .booking__form input,
+  .textarea,
+  .booking__form select {
+    font-size: 0.8rem;
+  }
+}

@@ -1,0 +1,38 @@
+.footer {
+    height: auto;
+
+  }
+
+.logo {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 90%;
+  }
+
+.bot {
+    padding-top: 0%;
+    height: 100px;
+}
+
+.footer-copyright {
+    text-align: center;
+    font-size: 14px;
+    color: #ffffff;
+  }
+
+.footer-copyright {
+    height: 20px;
+    text-align: center;
+    font-size: 14px;
+    color: #ffffff;
+  }
+  
+.link:hover {
+    color: rgb(156, 9, 240);
+  }
+
+.social:hover {
+    color: rgb(156, 9, 240);
+  }

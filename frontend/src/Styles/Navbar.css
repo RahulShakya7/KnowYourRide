@@ -1,0 +1,148 @@
+
+.navbar {
+  position: fixed;
+  background-color: black;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 10px;
+  z-index: 999;
+}
+
+.drawer {
+  width: 50%;
+}
+
+.burger {
+  font-size: 40px;
+}
+
+body::-webkit-scrollbar {
+  width: 0rem; /* width of the scrollbar track */
+}
+
+.drawermenu {
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  width: 400px;
+  font-size: 20px;
+}
+
+/* Add padding to drawer menu links */
+.drawermenu .menu-item a {
+  padding: 10px 15px;
+  text-decoration: none;
+  color: white;
+}
+
+/* Apply hover effect to drawer menu links */
+.drawermenu .menu-item a:hover {
+  color: rgb(156, 9, 240); /* Change the color to purple on hover */
+}
+
+
+.menu {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  width: 800px;
+  font-size: 20px;
+  flex-wrap: wrap;
+}
+
+.burger-btn {
+  border: none;
+}
+
+.welcome-text {
+  position: sticky;
+  padding-top: 60px;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 130px;
+  background-color: rgb(0, 0, 0);
+  color: rgb(255, 255, 255);
+  display: flex;
+  align-items: center;
+  padding-left: 10px;
+  font-size: 40px;
+  box-shadow: none;
+  z-index: 2;
+}
+
+.menu-item {
+  position: relative;
+  margin-top: 20px;
+  padding-left: 10px;
+  margin-left: 20px;
+}
+
+.main__navbar {
+  position: fixed;
+  top: 65px; /* To avoid overlapping with the fixed navbar */
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 0 10px;
+  /* background-color: black; */
+  z-index: 998;/* Set the z-index to be lower than the navbar, so it appears below it */
+}
+
+/* Add padding to nav links */
+.navigation .menu .nav__item {
+  padding: 10px 15px;
+  text-decoration: none;
+  color: white;
+  transition: color 0.2s ease;
+}
+
+.navigation .menu .nav__item:hover {
+  color: rgb(156, 9, 240);
+}
+
+/* Additional styles for active link */
+.navigation .menu .nav__active {
+  color: rgb(156, 9, 240);
+}
+
+/* Add media query for mobile view */
+@media (max-width: 698px) {
+  .main__navbar {
+    overflow-x: auto;
+    white-space: nowrap;
+    justify-content: flex-start;
+  }
+
+  .navigation__wrapper {
+    flex-direction: row;
+    justify-content: flex-start;
+  }
+
+  .navigation .menu {
+    padding: 10;
+  }
+
+  .navigation .menu .nav__item {
+    margin-right: 20px;
+  }
+}
+
+/* Add media query for larger screens */
+@media (min-width: 699px) {
+  .main__navbar {
+    overflow: hidden;
+  }
+
+  .navigation__wrapper {
+    flex-direction: column;
+  }
+
+  .navigation .menu .nav__item {
+    margin-right: 0;
+  }
+}

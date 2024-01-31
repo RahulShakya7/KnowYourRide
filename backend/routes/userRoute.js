@@ -29,6 +29,8 @@ router.get('/getuser/:id' , async (req, res, next) => {
   }
 });
 
+const passwordRegex = /^(?=.*[A-Z])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{8,}$/;
+
 router.post('/signup', async (req, res, next) => {
   try {
     const { username, firstname, lastname, email, password, role } = req.body;
@@ -37,7 +39,13 @@ router.post('/signup', async (req, res, next) => {
     const existingUser = await User.findOne({ username });
 
     if (existingUser) {
-      return res.status(409).json({ error: 'Username already exists' });
+      return res.status(400).json({ error: 'Username already exists' });
+    }
+
+    if (!passwordRegex.test(password)) {
+      return res.status(400).json({
+        error: 'Password must have at least 8-12 characters, including 1 uppercase letter, and 1 special character'
+      });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -60,41 +68,50 @@ router.post('/signup', async (req, res, next) => {
 });
 
 router.post('/signin', async (req, res) => {
-  try {
-    const { username, password } = req.body;
+  const { username, password } = req.body;
 
-    const user = await User.findOne({ username });
+  try {
+    let user = await User.findOne({ username });
+
     if (!user) {
       return res.status(400).json({ error: 'User not registered' });
     }
 
     const passwordMatch = await bcrypt.compare(password, user.password);
+
     if (!passwordMatch) {
-      return res.status(400).json({ error: 'Password did not match' });
-    } else {
-      // Create payload for JWT
-      const payload = {
-        id: user._id,
-        username: user.username,
-        fullname: user.firstname + ' ' + user.lastname,
-        email: user.email,
-        role: user.role
-      };
-      // Generate JWT token
-      jwt.sign(
-        payload,
-        process.env.SECRET,
-        { expiresIn: '1d' },
-        (err, token) => {
-          if (err) return res.status(500).json({ error: err.message });
-          res.json({ status: 'success', message: 'Login Successfull. Welcome : ' + username, token: token, userId: user._id, role: user.role });
-        }
-      );
+      return res.status(400).json({ error: 'Password incorrect' });
     }
+
+    // Reset failed login attempts on successful login
+    await User.updateOne({ username }, { $set: { failedLoginAttempts: 0 } });
+
+    // Create payload for JWT
+    const payload = {
+      id: user._id,
+      username: user.username,
+      fullname: user.firstname + ' ' + user.lastname,
+      email: user.email,
+      role: user.role
+    };
+
+    // Generate JWT token
+    const token = jwt.sign(payload, process.env.SECRET, { expiresIn: '1d' });
+
+    res.json({
+      status: 'success',
+      message: 'Login Successful. Welcome: ' + username,
+      token: token,
+      userId: user._id,
+      role: user.role
+    });
   } catch (error) {
+    console.error('Error:', error.message);
     res.status(500).json({ error: error.message });
   }
 });
+
+
 
 router.post('/:id/profileimage', userProfileUpload, async (req, res, next) => {
   if (!req.file) {

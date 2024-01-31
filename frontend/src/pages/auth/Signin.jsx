@@ -38,6 +38,7 @@ export default function SignIn() {
                         localStorage.setItem("token", response.data.token);
                         localStorage.setItem("role", response.data.role);
                         localStorage.setItem("username", user.username);
+                        localStorage.setItem("userId", response.data.userId);
                         console.log(response.data.userId);
                         console.log(response.data.role);
                         if (response.data.role === 'admin') {
@@ -47,11 +48,17 @@ export default function SignIn() {
                         }
                     } else {
                         console.log("Else");
-                        message.error(response.data.message);
+                        // console.log('Server response:', error.response.data);
+                        const errorMessage = response.data.error;
+                        message.error(errorMessage);
+                        message.error("Unable to Login");
                 }
             }
         } catch (error) {
             console.log(error);
+            // console.log('Server response:', error.response.data);
+            const errorMessage = error.response.data.error;
+            message.error(errorMessage);
             message.error("Unable to Login");
         }
     };

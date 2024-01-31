@@ -64,6 +64,7 @@ export default function Navbar() {
   const logOut = async () => {
     try {
       localStorage.removeItem("token");
+      localStorage.removeItem("role")
       // localStorage.removeItem("role");
       localStorage.removeItem("username");
       message.warning("Logged Out");
@@ -97,6 +98,7 @@ export default function Navbar() {
               <ul className="drawermenu p-40 w-80 h-full bg-black text-white">
                   <li className="welcome-text">Welcome {username}</li>
                   <li className="menu-item"><Link to="home">Home</Link></li>
+                  <li className="menu-item"><Link to="profile">Profile</Link></li>
                   {role === "admin" && <li className="menu-item"><Link to="admin">Admin Page</Link></li>}
                   <li className="menu-item"><Link to="signin">Sign In</Link></li>
                   <li className="menu-item"><Link to="signup">Create An Account</Link></li>

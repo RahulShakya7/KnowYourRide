@@ -3,6 +3,7 @@ import axios from "axios";
 import React, { useState } from "react";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
 import { Link } from "react-router-dom";
+import zxcvbn from "zxcvbn";
 import useCustomNavigate from "../../Routers/Pathhook";
 
 export default function SignUp() {
@@ -14,6 +15,10 @@ export default function SignUp() {
     const [confirmPassword, setConfirmPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
     const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
+    const [passwordStrength, setPasswordStrength] = useState({
+        score: 0,
+        feedback: "",
+    });
     const goToPage = useCustomNavigate();
 
     const toggleShowPassword = () => {
@@ -23,6 +28,19 @@ export default function SignUp() {
     const toggleShowPasswordConfirm = () => {
       setShowPasswordConfirm(!showPasswordConfirm);
     };
+
+    const handlePasswordChange = (e) => {
+        const newPassword = e.target.value;
+        setPassword(newPassword);
+    
+        // Use zxcvbn to get password strength feedback
+        const result = zxcvbn(newPassword);
+    
+        setPasswordStrength({
+          score: result.score,
+          feedback: result.feedback.suggestions.join(" "),
+        });
+      };
   
     const handleSignup = async () => {
         if (!username || !firstname || !lastname || !email || !password || !confirmPassword) {
@@ -45,16 +63,30 @@ export default function SignUp() {
         try {
             const response = await axios.post("http://localhost:3000/users/signup", user);
             console.log(response);
+            console.log("In message.error");
             if (response.status === 201) {
                 console.log(response.data.message);
                 message.success(response.data.message);
                 goToPage("/signin");
             } else {
                 console.log("In message.error");
-                message.error(response.data.message);
+                console.log(response.data.message);
             }
         } catch (error) {
-            console.log(error.message);
+            console.log('Network error:', error.message);
+            if (!error.response) {
+                // Handle network errors
+                message.error('Network error. Please try again later.');
+                return;
+            }
+            console.log('Server response:', error.response.data);
+
+            const errorMessage = error.response.data.error;
+        
+            console.log('Error message:', errorMessage);
+            
+            // Display the error message using Ant Design's message.error
+            message.error(errorMessage, 5);
         }
     };
 
@@ -135,7 +167,7 @@ export default function SignUp() {
                         id="password"
                         className="block w-full px-4 py-2 mt-2 text-purple-700 bg-white border rounded-md focus:border-purple-400 focus:ring-purple-300 focus:outline-none focus:ring focus:ring-opacity-40"
                         value={password}
-                        onChange={(e) => setPassword(e.target.value)}
+                        onChange={handlePasswordChange}
                         />
                         <span
                         className="absolute top-1/2 right-2 -translate-y-1/2 cursor-pointer"
@@ -150,6 +182,29 @@ export default function SignUp() {
                         </span>
                     </div>
                     </div>
+                    <div className="mt-2 flex items-center">
+                        <div
+                            className={`w-1/4 h-2 bg-purple-300 rounded-md ${
+                            passwordStrength.score >= 1 ? 'bg-red-500' : ''
+                            }`}
+                        ></div>
+                        <div
+                            className={`w-1/4 h-2 bg-purple-300 rounded-md ${
+                            passwordStrength.score >= 2 ? 'bg-yellow-500' : ''
+                            }`}
+                        ></div>
+                        <div
+                            className={`w-1/4 h-2 bg-purple-300 rounded-md ${
+                            passwordStrength.score >= 3 ? 'bg-yellow-300' : ''
+                            }`}
+                        ></div>
+                        <div
+                            className={`w-1/4 h-2 bg-purple-300 rounded-md ${
+                            passwordStrength.score >= 4 ? 'bg-green-400' : ''
+                            }`}
+                        ></div>
+                    </div>
+
                     <div className="mb-2">
                     <label
                         htmlFor ="confirmPassword"

@@ -32,7 +32,7 @@ const userSchema = new mongoose.Schema({
         type : String,
         enum : ['customer','admin','moderator'],
         default : 'customer'   
-    }
+    },
 })
 
 userSchema.set('toJSON', {

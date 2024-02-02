@@ -6,6 +6,7 @@ const userroute = require('./routes/userRoute');
 const { verifyUser, verifyAdmin } = require('./middlewares/authMiddleware');
 const connectDB = require('./db');
 const cors = require('cors');
+const { logAPICall } = require('./utils/logger');
 
 require('dotenv').config()
 const port = process.env.PORT
@@ -19,6 +20,7 @@ app.use(cors({
   }));
   
 app.use(express.json());
+app.use(logAPICall)
 
 app.use(express.static('public'))
 

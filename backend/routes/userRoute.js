@@ -6,6 +6,10 @@ const { upload, userProfileUpload } = require('../middlewares/uploads');
 const { verifyUser } = require('../middlewares/authMiddleware');
 const router = express.Router()
 
+const MAX_LOGIN_ATTEMPTS = 5;
+const LOCKOUT_DURATION = 5 * 60 * 1000;
+const PASSWORD_EXPIRY_DAYS = 90;
+
 // const transporter = require('./path-to-your-transporter-file'); // Adjust the path accordingly
 // const OtpModel = require('./path-to-your-otp-model-file'); // Adjust the path accordingly
 
@@ -157,7 +161,41 @@ router.post('/signin', async (req, res) => {
     }
 
     // Reset failed login attempts on successful login
-    await User.updateOne({ username }, { $set: { failedLoginAttempts: 0 } });
+    if (user.lockUntil && user.lockUntil > Date.now()) {
+      return res
+        .status(401)
+        .json({ message: "Account is locked. Please try again later." });
+    }
+
+    const lastChangeDate = new Date(user.lastPasswordChange);
+    const expiryDate = new Date(lastChangeDate);
+    expiryDate.setDate(expiryDate.getDate() + PASSWORD_EXPIRY_DAYS);
+    // expiryDate.setMinutes(expiryDate.getMinutes() + PASSWORD_EXPIRY_MINUTES);
+
+    if (expiryDate < new Date()) {
+      return res
+        .status(401)
+        .json({ message: "Password has expired. Please reset your password." });
+    }
+    
+
+    // Check if the passwords match
+    if (!passwordMatch) {
+      user.loginAttempts += 1;
+
+      // Lock the account if too many failed attempts
+      if (user.loginAttempts >= MAX_LOGIN_ATTEMPTS) {
+        user.lockUntil = Date.now() + LOCKOUT_DURATION;
+        user.loginAttempts = 0;
+      }
+
+      await user.save();
+
+      return res.status(401).json({ message: "Invalid credentials" });
+    }
+
+    user.loginAttempts = 0;
+    await user.save();
 
     // Create payload for JWT
     const payload = {
@@ -171,7 +209,7 @@ router.post('/signin', async (req, res) => {
 
     // sendOTP(user.email);
     // Generate JWT token
-    const token = jwt.sign(payload, process.env.SECRET, { expiresIn: '10s' });
+    const token = jwt.sign(payload, process.env.SECRET, { expiresIn: '5d' });
 
     res.json({
       status: 'success',
@@ -186,6 +224,73 @@ router.post('/signin', async (req, res) => {
   }
 });
 
+router.post('/changepw/:id', async (req, res) => {
+  try {
+    const { oldPassword, newPassword } = req.body;
+    const { id } = req.params;
+
+    // Find the user by ID
+    const user = await User.findById(id);
+
+    // Check if the user exists
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Compare the provided old password with the stored hashed password
+    const passwordMatch = await bcrypt.compare(oldPassword, user.password);
+
+    // Check if the old password is correct
+    if (!passwordMatch) {
+      return res.status(401).json({ message: "Incorrect old password" });
+    }
+
+    // Check if the new password is the same as the old password
+    if (oldPassword === newPassword) {
+      return res.status(400).json({
+        message: "New password must be different from the old password",
+      });
+    }
+
+    // Check if the new password meets complexity requirements
+    if (!PASSWORD_COMPLEXITY_REGEX.test(newPassword)) {
+      return res.status(400).json({
+        message:
+          "New password must include at least one uppercase letter, one lowercase letter, one digit, and one special character.",
+      });
+    }
+
+    // Check if the new password is in the password history
+    if (
+      user.passwordHistory.some((entry) =>
+        bcrypt.compareSync(newPassword, entry.password)
+      )
+    ) {
+      return res.status(400).json({
+        message:
+          "New password cannot be the same as any of the recent passwords.",
+      });
+    }
+
+    // Store the old password in the password history
+    user.passwordHistory.push({
+      password: user.password,
+      changeDate: user.lastPasswordChange,
+    });
+
+    // Update the user's password
+    user.password = await bcrypt.hash(newPassword, 10);
+    user.lastPasswordChange = Date.now();
+
+    // Save the updated user to the database
+    await user.save();
+
+    res.json({ message: "Password changed successfully" });
+  } catch (err) {
+    console.error("Error changing password:", err);
+    res.status(500).json({ message: "Error changing password" });
+  }
+});
 
 
 router.post('/:id/profileimage', userProfileUpload, async (req, res, next) => {

@@ -24,22 +24,6 @@ export default function Home() {
       {/* ============= hero section =========== */}
       <section className="p-0 hero__slider-section">
         <HeroSlider />
-
-        {/* <div className="hero__form absolute top-0 left-0 right-0 bottom-0 bg-opacity-75 bg-black">
-          <div className="container mx-auto h-full">
-            <div className="grid grid-cols-1 lg:grid-cols-2 h-full">
-              <div className="lg:col-span-1 flex items-center p-8">
-                <h2 className="text-white text-4xl font-bold">
-                  Find your best Vehicle here
-                </h2>
-              </div>
-
-              <div className="lg:col-span-1 flex items-center p-8">
-                <FindVehicle />
-              </div>
-            </div>
-          </div>
-        </div> */}
       </section>
 
       {/* =============== News section =========== */}

@@ -22,8 +22,7 @@ const AdminPage = () => {
   const [ newsImageName, setNewsImageName] = useState(""); 
   const [editPopupVisible, setEditPopupVisible] = useState(false);
   const [editedNews, setEditedNews] = useState(null);
-
-
+  const userRole = localStorage.getItem('role');
 
   // Get Vehicle List
   useEffect(() => {
@@ -264,6 +263,7 @@ const handleCancelEditPopup = () => {
   return (
     <Helmet title="Admin">
       <CommonSection title="Admin" />
+      {userRole === 'admin' ? (
         <div className="p-8 min-h-screen">
           <h1 className="text-3xl font-bold mb-14">Admin Page</h1>
             <div className="tabs tabs-boxed flex-col md:flex-row justify-center md:justify-center p-4 m-2 space-x-2 md:space-x-2">
@@ -471,13 +471,18 @@ const handleCancelEditPopup = () => {
               )}
               
               <EditNewsPopup
-  visible={editPopupVisible}
-  onCancel={handleCancelEditPopup}
-  onEdit={handleSaveEditedNews}
-  newsData={editedNews}
-/>
+                visible={editPopupVisible}
+                onCancel={handleCancelEditPopup}
+                onEdit={handleSaveEditedNews}
+                newsData={editedNews}
+              />
           </div>
         </div>
+        ) : (
+          <div className='flex texts-center'>
+            <h1 className="texts-center text-3xl font-bold mb-14">You do not have permission to access this page.</h1>
+          </div>
+        )}
     </Helmet>
   );
 };

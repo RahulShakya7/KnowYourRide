@@ -26,7 +26,6 @@ export default function VehicleListing() {
   const filteredVehicles = selectedVehicleType === "All"
     ? vehicle
     : vehicle.filter(item => item.vtype === selectedVehicleType);
-
   return (
     <Helmet title="vehicles">
       <CommonSection title="Vehicle Reviews" />

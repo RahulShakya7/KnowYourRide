@@ -6,6 +6,79 @@ const { upload, userProfileUpload } = require('../middlewares/uploads');
 const { verifyUser } = require('../middlewares/authMiddleware');
 const router = express.Router()
 
+// const transporter = require('./path-to-your-transporter-file'); // Adjust the path accordingly
+// const OtpModel = require('./path-to-your-otp-model-file'); // Adjust the path accordingly
+
+// async function sendOTP(email) {
+//   const otpCode = Math.floor(100000 + Math.random() * 900000);
+//   await transporter.sendMail({
+//     from: process.env.GOOGLE_USER_ID,
+//     to: email,
+//     subject: "OTP Verification",
+//     html: `<!DOCTYPE html>
+// <html>
+// <head>
+//   <title>OTP Email</title>
+//   <style>
+//     body {
+//       font-family: Arial, sans-serif;
+//     }
+//     .container {
+//       max-width: 600px;
+//       margin: 0 auto;
+//       padding: 20px;
+//       background-color: #f5f5f5;
+//       border: 1px solid #ddd;
+//       border-radius: 5px;
+//     }
+//     h1 {
+//       color: #333;
+//       margin-top: 0;
+//     }
+//     p {
+//       margin-bottom: 20px;
+//     }
+//     .otp {
+//       background-color: #007bff;
+//       color: #fff;
+//       padding: 10px;
+//       font-size: 24px;
+//       font-weight: bold;
+//       text-align: center;
+//       border-radius: 5px;
+//     }
+//     .footer {
+//       margin-top: 20px;
+//       text-align: center;
+//       color: #777;
+//     }
+//   </style>
+// </head>
+// <body>
+//   <div class="container">
+//     <h1>POS System</h1>
+//     <p>Dear User,</p>
+//     <p>Your One-Time Password (OTP) for login is:</p>
+//     <div class="otp">${otpCode}</div>
+//     <p>Please enter this OTP to complete your login process.</p>
+//     <div class="footer">
+//       <p>Thank you!</p>
+//     </div>
+//   </div>
+// </body>
+// </html>
+// `,
+//   });
+//   // Save the OTP in the database
+//   const otpData = {
+//     email: email,
+//     otp: otpCode,
+//     createdAt: new Date(),
+//   };
+ 
+//   await OtpModel.create(otpData);
+// }
+
 router.get('/getusers', async (req, res, next) => {
   const users = await User.find({});
   res.status(200).json({
@@ -95,8 +168,10 @@ router.post('/signin', async (req, res) => {
       role: user.role
     };
 
+
+    // sendOTP(user.email);
     // Generate JWT token
-    const token = jwt.sign(payload, process.env.SECRET, { expiresIn: '1d' });
+    const token = jwt.sign(payload, process.env.SECRET, { expiresIn: '10s' });
 
     res.json({
       status: 'success',
